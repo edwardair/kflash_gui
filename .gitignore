@@ -113,3 +113,4 @@ kflash_gui.conf
 # special
 !dist_tool/appimage/app/usr/lib/
 
+.idea
