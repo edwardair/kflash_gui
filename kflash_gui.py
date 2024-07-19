@@ -1462,7 +1462,7 @@ class MainWindow(QMainWindow):
             self.errorSignal.emit(err, msg)
             return
 
-        KFlash.open_terminal(True, config['dev'])
+        KFlash.open_terminal(config['dev'])
         pass
 
 def main():
@@ -1484,5 +1484,12 @@ def main():
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == 'terminal':
+        from kflash_py.open_terminal import open_terminal
+        open_terminal(True, sys.argv[2], sys.argv[3])
+        sys.exit(0)
     main()
+else:
+    pass
+
 
