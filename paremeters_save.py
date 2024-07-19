@@ -28,7 +28,7 @@ class ParametersToSave:
     def __del__(self):
         pass
     
-    def save(self, path):
+    def save(self, path, last_conf_save_path=None):
         data = {}
         rm = []
         for f in self.files:
@@ -54,9 +54,15 @@ class ParametersToSave:
         try:
             with open(path, "w+") as f:
                 json.dump(data, f, indent=4)
+            if last_conf_save_path is not None:
+                try:
+                    with open(last_conf_save_path, 'w', encoding='utf8') as f:
+                        f.write(path)
+                except:
+                    pass
         except:
             pass
-    
+
     def load(self, path):
         try:
             with open(path, "r") as f:

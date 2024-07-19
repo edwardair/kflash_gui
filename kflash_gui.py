@@ -256,7 +256,22 @@ class MainWindow(QMainWindow):
         eraseLayout.addWidget(self.eraseLenUnit, 2, 2, 1, 1)
         eraseLayout.addWidget(self.eraseLoadConfigCombobox, 3, 1, 1, 1)
         eraseLayout.addWidget(self.eraseLoadButton, 3, 2, 1, 1)
-        
+
+        # 多个配置文件列表
+        self.confSelectGroupBox = QGroupBox(tr("SelectConf"))
+        # container
+        settingLayout.addWidget(self.confSelectGroupBox)
+        self.confSelectContainerLayout = QHBoxLayout()
+        self.confSelectGroupBox.setLayout(self.confSelectContainerLayout)
+
+        self.confPathWidget = QLineEdit()
+        self.confSelectContainerLayout.addWidget(self.confPathWidget)
+        self.confPathWidget.setText(parameters.configFilePath)
+        self.confPathWidget.setToolTip(tr("Conf Path Save Tips"))
+
+        self.confPathButton = QPushButton(tr("OpenFile"))
+        self.confSelectContainerLayout.addWidget(self.confPathButton)
+
         # widgets file select
         self.fileSelectGroupBox = QGroupBox(tr("SelectFile"))
         # container
@@ -413,6 +428,7 @@ class MainWindow(QMainWindow):
         self.addFileButton.clicked.connect(lambda: self.fileSelectLayout.addWidget(self.addFileSelectionItem()[1]))
         self.packFilesButton.clicked.connect(self.packFiles)
         self.mergeBinButton.clicked.connect(self.mergeBin)
+        self.confPathButton.clicked.connect(self.selectConfFile)
 
         self.myObject=MyClass(self)
         slotLambda = lambda: self.indexChanged_lambda(self.myObject)
@@ -1042,6 +1058,24 @@ class MainWindow(QMainWindow):
             return
         self.fileSelectShow(item, fileName_choose)
 
+    def selectConfFile(self):
+        conf_path = parameters.getConfigFilePath(self.confPathWidget.text())
+        fileName_choose, filetype = QFileDialog.getOpenFileName(self,
+                                    tr("SelectConf"),
+                                    conf_path,
+                                    "Conf Files (*.conf)")   # 设置文件扩展名过滤,用双分号间隔
+
+        if fileName_choose == "":
+            return
+        if not self.isFileValid(fileName_choose):
+            self.errorSignal.emit(tr("Error"), tr("File path error"))
+            return
+        self.confPathWidget.setText(fileName_choose)
+        parameters.configFilePath = fileName_choose
+        self.programStartGetSavedParameters()
+        self.updateFrameParams()
+        self.programExitSaveParameters()
+
     def errorHint(self, title, str):
         QMessageBox.critical(self, title, str)
     
@@ -1134,7 +1168,8 @@ class MainWindow(QMainWindow):
         else:
             paramObj.ioMode = "qio"
 
-        paramObj.save(parameters.configFilePath)
+        paramObj.save(parameters.getConfigFilePath(self.confPathWidget.text(), verifyPathExists=False),
+                      last_conf_save_path=parameters.lastConfigSavePath)
 
     def programStartGetSavedParameters(self):
         paramObj = paremeters_save.ParametersToSave()
@@ -1172,7 +1207,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         try:
-            self.programExitSaveParameters()
+            # self.programExitSaveParameters()
             self.kflash.kill()
             self.kflash.checkKillExit()
         except Exception:
@@ -1276,6 +1311,7 @@ class MainWindow(QMainWindow):
         },None, None)
 
     def download(self):
+        self.programExitSaveParameters()
         if self.packing:
             self.hintSignal.emit(tr("Busy"), tr("Please wait, packing ..."))
             return
