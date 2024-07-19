@@ -138,5 +138,8 @@
     "flash io mode tips" : "通常 DIO 模式具有更好的兼容性，<br>而 QIO 模式具有更快的速度。<br>如果你发现你的k210无法启动，<br>你可以试试DIO模式",
     "DIO mode": "DIO 模式",
     "QIO mode": "QIO 模式",
-    "Conf Path Save Tips": "如需增加conf配置，仅需修改路径，在成功\"下载\"后，会自动保存到对应的路径下，以供下次直接选择使用"
+    "Conf Path Save Tips": "如需增加conf配置，仅需修改路径，在成功\"下载\"后，会自动保存到对应的路径下，以供下次直接选择使用",
+    "Run Title": "执行程序",
+    "Run CheckBox": "下载后打开终端",
+    "Run Now": "执行程序"
 }

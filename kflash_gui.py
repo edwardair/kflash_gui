@@ -368,6 +368,19 @@ class MainWindow(QMainWindow):
         settingLayout.setStretch(1,1)
         settingLayout.setStretch(2,2)
 
+        # 一键执行程序入口
+        runGroupBox = QGroupBox(tr("Run Title"))
+        settingLayout.addWidget(runGroupBox)
+        runLayout = QHBoxLayout()
+        runGroupBox.setLayout(runLayout)
+
+        self.runCheckBox = QCheckBox(tr("Run CheckBox"))
+        runLayout.addWidget(self.runCheckBox)
+
+        runButton = QPushButton(tr("Run Now"))
+        runLayout.addWidget(runButton)
+        runButton.clicked.connect(self.runProgram)
+
         # widgets progress bar
         
         self.progressbar = QProgressBar(self.progressbarRootWidget)
@@ -1168,6 +1181,8 @@ class MainWindow(QMainWindow):
         else:
             paramObj.ioMode = "qio"
 
+        paramObj.run = self.runCheckBox.isChecked()
+
         paramObj.save(parameters.getConfigFilePath(self.confPathWidget.text(), verifyPathExists=False),
                       last_conf_save_path=parameters.lastConfigSavePath)
 
@@ -1204,6 +1219,8 @@ class MainWindow(QMainWindow):
             self.spiFlashIoModeCombobox.setCurrentIndex(0)
         else:
             self.spiFlashIoModeCombobox.setCurrentIndex(1)
+
+        self.runCheckBox.setChecked(self.param.run)
 
     def closeEvent(self, event):
         try:
@@ -1300,6 +1317,7 @@ class MainWindow(QMainWindow):
             return (None, tr("Error"), tr("PleaseSelectSerialPort"))
         slow = self.slowModeCombobox.currentIndex()==0
         iomode = "dio" if self.spiFlashIoModeCombobox.currentIndex()==0 else "qio"
+        terminal = self.runCheckBox.isChecked()
         return ({
             "color": color,
             "board": board,
@@ -1307,7 +1325,8 @@ class MainWindow(QMainWindow):
             "dev": dev,
             "slow": slow,
             "baud": baud,
-            "iomode": iomode
+            "iomode": iomode,
+            "terminal": terminal,
         },None, None)
 
     def download(self):
@@ -1355,11 +1374,11 @@ class MainWindow(QMainWindow):
         hint = "<font color=%s>%s</font>" %("#ff0d0d", tr("DownloadStart"))
         self.progressHint.setText(hint)
         # download
-        burnThread = threading.Thread(target=self.flashBurnProcess, args=(config['dev'], config['baud'], config['board'], config['sram'], fileType, filesInfo, self.progress, config['color'], config['slow'], config['iomode']))
+        burnThread = threading.Thread(target=self.flashBurnProcess, args=(config['dev'], config['baud'], config['board'], config['sram'], fileType, filesInfo, self.progress, config['color'], config['slow'], config['iomode'], config['terminal']))
         burnThread.setDaemon(True)
         burnThread.start()
 
-    def flashBurnProcess(self, dev, baud, board, sram, fileType, files, callback, color, slow, io_mode):
+    def flashBurnProcess(self, dev, baud, board, sram, fileType, files, callback, color, slow, io_mode, terminal):
         success = True
         errMsg = ""
         tmpFile = ""
@@ -1391,7 +1410,7 @@ class MainWindow(QMainWindow):
                     success = False
         if success:
             try:
-                self.kflash.process(terminal=False, dev=dev, baudrate=baud, board=board, sram = sram, file=filename, callback=callback, noansi=not color, slow_mode=slow, io_mode=io_mode)
+                self.kflash.process(terminal=terminal, dev=dev, baudrate=baud, board=board, sram = sram, file=filename, callback=callback, noansi=not color, slow_mode=slow, io_mode=io_mode)
             except Exception as e:
                 errMsg = tr2(str(e))
                 if str(e) != "Burn SRAM OK":
@@ -1436,6 +1455,15 @@ class MainWindow(QMainWindow):
         self.progressHint.setText(hint)
         self.kflash.kill()
 
+    def runProgram(self):
+        print(f"运行终端")
+        config, err, msg = self.getSerialSettings()
+        if not config:
+            self.errorSignal.emit(err, msg)
+            return
+
+        KFlash.open_terminal(True, config['dev'])
+        pass
 
 def main():
     app = QApplication(sys.argv)
