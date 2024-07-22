@@ -1230,7 +1230,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         try:
-            # self.programExitSaveParameters()
+            self.programExitSaveParameters()
             self.kflash.kill()
             self.kflash.checkKillExit()
         except Exception:
