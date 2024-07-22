@@ -25,6 +25,12 @@ if sys.platform == "win32":
     import ctypes
 from  kflash_py.kflash import KFlash
 
+
+def is_frozen():
+    # 如果 sys._MEIPASS 存在，则表示是 PyInstaller 打包后的环境
+    return getattr(sys, 'frozen', False)
+
+
 class MyClass(object):
     def __init__(self, arg):
         super(MyClass, self).__init__()
@@ -1411,7 +1417,10 @@ class MainWindow(QMainWindow):
                     success = False
         if success:
             try:
-                self.kflash.process(terminal=terminal, dev=dev, baudrate=baud, board=board, sram = sram, file=filename, callback=callback, noansi=not color, slow_mode=slow, io_mode=io_mode)
+                # 通过代码执行process方法时，模拟参数输入
+                self.kflash.process(terminal=False, dev=dev, baudrate=baud, board=board, sram = sram, file=filename, callback=callback, noansi=not color, slow_mode=slow, io_mode=io_mode)
+                if terminal:
+                    self.runProgram()
             except Exception as e:
                 errMsg = tr2(str(e))
                 if str(e) != "Burn SRAM OK":
@@ -1426,7 +1435,6 @@ class MainWindow(QMainWindow):
         else:
             self.downloadResultSignal.emit(False, errMsg)
         self.burning = False
-            
 
     def downloadResult(self, success, msg):
         if success:
@@ -1463,7 +1471,11 @@ class MainWindow(QMainWindow):
             self.errorSignal.emit(err, msg)
             return
 
-        KFlash.open_terminal(config['dev'])
+        import subprocess
+        if is_frozen():
+            subprocess.Popen(['cmd','/K',sys.executable, '-r', '-t', ''], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        else:
+            subprocess.Popen(['cmd','/K',sys.executable, '-m', 'kflash_py.kflash', '-r', '-t', ''], creationflags=subprocess.CREATE_NEW_CONSOLE)
         pass
 
 def main():
@@ -1485,10 +1497,13 @@ def main():
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] == 'terminal':
-        from kflash_py.open_terminal import open_terminal
-        open_terminal(True, sys.argv[2], sys.argv[3])
+    if len(sys.argv) > 1:
+        print(f"load from subprocess")
+        from kflash_py.kflash import KFlash
+        kflash = KFlash()
+        kflash.process(terminal=sys.argv.__contains__('-t'), only_reboot=sys.argv.__contains__('-r'))
         sys.exit(0)
+        pass
     main()
 else:
     pass
