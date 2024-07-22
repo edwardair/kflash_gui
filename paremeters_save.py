@@ -18,7 +18,7 @@ class ParametersToSave:
         self.files = []       # [ (path, addr, firmware, enable), ...]
         self.board    = 0
         self.burnPosition = tr_en("Flash")
-        self.baudRate = 2
+        self.baudRate = 3
         self.skin = 2
         self.language = default_lang
         self.slowMode = True

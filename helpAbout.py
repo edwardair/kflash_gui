@@ -5,10 +5,10 @@ from translation import tr, tr_en
 import time
 
 versionMajor = 1
-versionMinor = 8
-versionDev   = 1
+versionMinor = 9
+versionDev   = 0
 
-date = "2022.06.20"
+date = "2024.07.22"
 
 def strAbout():
     pathDirList = sys.argv[0].replace("\\", "/").split("/")
@@ -30,10 +30,10 @@ def strAbout():
 <div><div>'''+parameters.appName+" "+tr("is a Open source project created by")+''' </div><a style="vertical-align: middle;" href="http://www.sipeed.com"><img src="'''+strPath+"/"+parameters.appLogo2+'''" width=109 height=32></img></a><br></div>
 ''' +tr("Author")+":"+parameters.author+'''<br><br>
 
-'''+tr("See more on")+''' <b><a href="https://github.com/Sipeed/kflash_gui.git">Github</a></b>,  '''+tr("Licensed with")+''' <a href="https://github.com/sipeed/kflash_gui/blob/master/LICENSE">LGPL3.0</a><br><br>
+'''+tr("See more on")+''' <b><a href="https://github.com/edwardair/kflash_gui">Github</a></b>,  '''+tr("Licensed with")+''' <a href="https://github.com/edwardair/kflash_gui/blob/master/LICENSE">LGPL3.0</a><br><br>
 
+'''+'Forcked and fixed from'+''' <b><a href="https://github.com/Sipeed/kflash_gui.git">Github</a></b>,  '''+tr("Licensed with")+''' <a href="https://github.com/sipeed/kflash_gui/blob/master/LICENSE">LGPL3.0</a><br><br>
 
-'''+tr("GUI dirived from")+''' <b><a href="https://github.com/Neutree/ComTool.git">ComTool</a></b>,  '''+tr("Licensed with")+''' <a href="https://github.com/Neutree/COMTool/blob/master/LICENSE">LGPL3.0</a>
 <br>
 -----------------------------------------
 '''

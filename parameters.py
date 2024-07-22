@@ -1,7 +1,7 @@
 import os, sys
 
 appName = "kflash_gui"
-author = "Neucrack"
+author = "edwardair"
 strDataDirName = "kflash_gui_data"
 strDataAssetsDirName = "kflash_gui_data/assets"
 appIcon = "assets/logo.png"

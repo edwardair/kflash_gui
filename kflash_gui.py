@@ -406,7 +406,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowSize()
         self.MoveToCenter()
-        self.setWindowTitle(parameters.appName+" V"+str(helpAbout.versionMajor)+"."+str(helpAbout.versionMinor))
+        self.setWindowTitle(parameters.appName+" V"+str(helpAbout.versionMajor)+"."+str(helpAbout.versionMinor)+'-ED')
         icon = QIcon()
         print("icon path:"+self.DataPath+"/"+parameters.appIcon)
         icon.addPixmap(QPixmap(self.DataPath+"/"+parameters.appIcon), QIcon.Normal, QIcon.Off)
@@ -1244,6 +1244,7 @@ class MainWindow(QMainWindow):
         self.frameWidget.style().unpolish(self.downloadButton)
         self.frameWidget.style().polish(self.downloadButton)
         self.frameWidget.update()
+        self.programExitSaveParameters()
 
     def skinChange(self):
         if self.param.skin == 1: # light
